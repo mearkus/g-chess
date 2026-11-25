@@ -11,7 +11,10 @@
     <main class="app">
       <header class="top">
         <h1>G Chess</h1>
-        <button class="icon-btn ui" id="settings-btn" aria-label="Settings">⚙︎</button>
+        <div class="top-btns">
+          <button class="icon-btn ui" id="leaderboard-btn" aria-label="Leaderboard">🏆</button>
+          <button class="icon-btn ui" id="settings-btn" aria-label="Settings">⚙︎</button>
+        </div>
       </header>
 
       <p class="status ui" id="status" role="status" aria-live="polite">Your turn!</p>
@@ -37,6 +40,15 @@
           <label><input type="radio" name="mode" value="computer" checked /> The computer</label>
           <label><input type="radio" name="mode" value="friend" /> A friend</label>
         </fieldset>
+        <fieldset id="me-set">
+          <legend>Who are you?</legend>
+          <label>Me <select name="me" class="player-pick"></select></label>
+        </fieldset>
+        <fieldset id="friends-set">
+          <legend>Who's playing?</legend>
+          <label>White <select name="white" class="player-pick"></select></label>
+          <label>Black <select name="black" class="player-pick"></select></label>
+        </fieldset>
         <fieldset id="level-set">
           <legend>Computer level</legend>
           <label><input type="radio" name="level" value="easy" checked /> Easy</label>
@@ -55,6 +67,19 @@
         <div class="sheet-actions">
           <button class="btn ui" value="cancel">Cancel</button>
           <button class="btn ui primary" value="start">Start</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="leaderboard" class="sheet">
+      <form method="dialog">
+        <h2>🏆 Leaderboard</h2>
+        <p class="lb-empty" id="lb-empty">No games yet. Finish a game to get on the board!</p>
+        <ol class="lb-list" id="lb-list"></ol>
+        <h3 class="lb-heading" id="lb-pairs-title">Friend vs friend</h3>
+        <ul class="lb-pairs" id="lb-pairs"></ul>
+        <div class="sheet-actions one">
+          <button class="btn ui primary" value="close">Done</button>
         </div>
       </form>
     </dialog>

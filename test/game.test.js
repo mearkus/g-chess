@@ -72,4 +72,21 @@ describe('Game', () => {
     for (const [f, t] of [['e2', 'e4'], ['d7', 'd5'], ['e4', 'd5']]) g.move(f, t);
     expect(g.captured().w).toEqual(['p']);
   });
+
+  it('knows who won, or that it was a tie', () => {
+    const g = new Game({ mode: 'friend' });
+    expect(g.result()).toBeNull();
+    for (const [f, t] of [['f2', 'f3'], ['e7', 'e5'], ['g2', 'g4'], ['d8', 'h4']]) g.move(f, t);
+    expect(g.result()).toEqual({ winner: 'b' });
+    const tie = new Game({ mode: 'friend' });
+    tie.chess.load('7k/5Q2/6K1/8/8/8/8/8 b - - 0 1'); // stalemate
+    expect(tie.result()).toEqual({ winner: null });
+  });
+
+  it('remembers who is playing through save and load', () => {
+    const g = new Game({ mode: 'friend', players: { w: 'dragon', b: 'owl' } });
+    const copy = new Game(g.save());
+    expect(copy.players).toEqual({ w: 'dragon', b: 'owl' });
+    expect(new Game({ playerColor: 'b' }).players).toEqual({ w: 'computer', b: 'fox' });
+  });
 });

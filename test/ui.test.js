@@ -42,4 +42,31 @@ describe('page', () => {
     document.getElementById('hint-btn').click();
     expect(document.querySelectorAll('.sq.hint')).toHaveLength(2);
   });
+
+  it('a finished friend game shows up on the leaderboard once', () => {
+    const settings = document.getElementById('settings');
+    const form = settings.querySelector('form');
+    document.getElementById('new-btn').click();
+    form.elements.mode.value = 'friend';
+    settings.dispatchEvent(new Event('change'));
+    form.elements.white.value = 'dragon';
+    form.elements.black.value = 'shark';
+    settings.returnValue = 'start';
+    settings.dispatchEvent(new Event('close'));
+
+    for (const [f, t] of [['f2', 'f3'], ['e7', 'e5'], ['g2', 'g4'], ['d8', 'h4']]) { tap(f); tap(t); }
+    expect(document.getElementById('status').textContent).toMatch(/Black wins/);
+
+    // Undo and win again: still only one game counted.
+    document.getElementById('undo-btn').click();
+    tap('d8'); tap('h4');
+
+    document.getElementById('leaderboard-btn').click();
+    const rows = [...document.querySelectorAll('#lb-list li')];
+    expect(rows).toHaveLength(2);
+    expect(rows[0].textContent).toMatch(/🥇.*Shark.*1\s*win/);
+    expect(rows[1].textContent).toMatch(/Dragon.*1 loss/);
+    expect(document.getElementById('lb-pairs').textContent).toMatch(/Dragon 0 – 1 Shark|Shark 1 – 0 Dragon/);
+    expect(document.getElementById('lb-empty').hidden).toBe(true);
+  });
 });

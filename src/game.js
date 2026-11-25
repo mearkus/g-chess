@@ -2,6 +2,7 @@
 // No DOM in here, so everything is easy to test.
 import { Chess } from 'chess.js';
 import { pickMove, bestMove } from './engine.js';
+import { COMPUTER } from './leaderboard.js';
 
 export const PIECE_NAMES = { k: 'king', q: 'queen', r: 'rook', b: 'bishop', n: 'knight', p: 'pawn' };
 
@@ -12,15 +13,25 @@ export class Game {
    * @param {'easy'|'medium'|'hard'} [opts.level]
    * @param {'w'|'b'} [opts.playerColor] which side the player is on against the computer
    * @param {string} [opts.pgn] a saved game to carry on with
+   * @param {{w: string, b: string}} [opts.players] who is playing each side (leaderboard ids)
+   * @param {boolean} [opts.recorded] whether this game's result is already on the leaderboard
    */
-  constructor({ mode = 'computer', level = 'easy', playerColor = 'w', pgn = '' } = {}) {
+  constructor({ mode = 'computer', level = 'easy', playerColor = 'w', pgn = '', players, recorded } = {}) {
     this.mode = mode;
     this.level = level;
     this.playerColor = playerColor;
+    this.players = players || Game.defaultPlayers(mode, playerColor);
     this.chess = new Chess();
     if (pgn) {
       try { this.chess.loadPgn(pgn); } catch { this.chess.reset(); }
     }
+    // A game saved before the leaderboard existed that had already finished doesn't count.
+    this.recorded = recorded ?? this.over;
+  }
+
+  static defaultPlayers(mode, playerColor = 'w') {
+    if (mode === 'friend') return { w: 'fox', b: 'tiger' };
+    return playerColor === 'w' ? { w: 'fox', b: COMPUTER } : { w: COMPUTER, b: 'fox' };
   }
 
   get turn() { return this.chess.turn(); }
@@ -85,6 +96,16 @@ export class Game {
     return taken;
   }
 
+  /**
+   * How the game ended: { winner: 'w' | 'b' } for a checkmate, { winner: null } for a tie,
+   * or null while it's still going.
+   */
+  result() {
+    if (!this.over) return null;
+    if (this.chess.isCheckmate()) return { winner: this.turn === 'w' ? 'b' : 'w' };
+    return { winner: null };
+  }
+
   /** A short, friendly line about where the game stands. */
   status() {
     const c = this.chess;
@@ -116,6 +137,13 @@ export class Game {
   }
 
   save() {
-    return { mode: this.mode, level: this.level, playerColor: this.playerColor, pgn: this.chess.pgn() };
+    return {
+      mode: this.mode,
+      level: this.level,
+      playerColor: this.playerColor,
+      players: this.players,
+      recorded: this.recorded,
+      pgn: this.chess.pgn(),
+    };
   }
 }

@@ -212,3 +212,36 @@ button, .ui { touch-action: manipulation; }
   #tray-top, #tray-bottom { display: none; }
   .controls { grid-template-columns: 1fr; }
 }
+
+/* Leaderboard */
+.top-btns { display: flex; gap: 8px; }
+.sheet select {
+  margin-left: auto;
+  min-height: 44px;
+  min-width: 10rem;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 10px;
+  font-size: 1.1rem;
+}
+.sheet-actions.one { grid-template-columns: 1fr; margin-top: 12px; }
+.lb-empty { color: var(--muted); font-size: 1.1rem; }
+.lb-list, .lb-pairs { list-style: none; margin: 0; padding: 0; max-height: 50dvh; overflow-y: auto; }
+.lb-list li {
+  display: grid;
+  grid-template-columns: 2.6rem 2.4rem 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+  border-radius: 12px;
+}
+.lb-list li:first-child { background: rgba(246, 224, 94, 0.18); }
+.lb-place { font-size: 1.6rem; text-align: center; font-weight: 700; }
+.lb-icon { font-size: 1.9rem; text-align: center; }
+.lb-name { font-size: 1.2rem; font-weight: 700; }
+.lb-name small { display: block; font-size: 0.85rem; font-weight: 400; color: var(--muted); }
+.lb-wins { text-align: right; font-size: 0.9rem; color: var(--muted); }
+.lb-wins b { display: block; font-size: 1.6rem; color: var(--text); }
+.lb-heading { margin: 14px 0 6px; font-size: 1rem; color: var(--muted); }
+.lb-pairs li { padding: 6px 4px; font-size: 1.1rem; }
+.lb-pairs small { color: var(--muted); }
