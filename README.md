@@ -7,6 +7,11 @@ computer (easy, medium or hard) or a friend on the same screen. There's an
 Undo button, a Hint button that lights up a good move, and the game remembers
 where you were if you close it.
 
+Tap 🏆 to see the leaderboard. Before a game, pick who's playing (🦊 Fox,
+🐉 Dragon and friends). Every finished game counts: wins against the computer
+on each level, and wins, losses and ties between friends. It's saved on this
+device only.
+
 ## Getting started
 
 ```bash
@@ -31,3 +36,4 @@ Things to build next. Add your own!
 - A coach that explains moves while you play
 - Pick your own board colors
 - A funny celebration when you win
+- Leaderboard: type your own nickname (needs Dad's OK), and a button to start the leaderboard over

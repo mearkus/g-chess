@@ -52,11 +52,15 @@ behavior changes, `npm test` passing before you call something done.
 - `src/main.js`: draws the board and handles taps; runs the computer's move on a short timer.
 - `src/game.js`: game state on top of chess.js (moves, undo, hint, captured pieces,
   friendly status text, save/load). No DOM, so it's unit tested.
+- `src/leaderboard.js`: the leaderboard (wins, losses and ties for each player, wins against
+  the computer by level, friend-vs-friend scores, and the ranking). No DOM, so it's unit tested.
+  Players pick a fun character (🦊 Fox, 🐯 Tiger…) instead of typing a name.
 - `src/engine.js`: the computer opponent (small alpha-beta search). Levels easy/medium/hard
   set search depth and how often it plays a random move.
 - `src/style.css`: all the looks. Colors are CSS variables at the top of the file, an
   easy first place for him to make changes.
 - `test/`: Vitest tests. `ui.test.js` runs the page in jsdom and taps squares.
 - The game saves itself to `localStorage` (`g-chess:v1`), so a reload carries on.
+  The leaderboard lives in `localStorage` too (`g-chess:leaderboard:v1`), only on this device.
 - Starter-kit skills (from `mearkus/starter`) that fit this project: `add-game-audio`,
   `add-game-tutorial`, `mobile-polish`, `deploy-github-pages`.
