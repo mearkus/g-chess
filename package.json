@@ -1,0 +1,23 @@
+{
+  "name": "g-chess",
+  "version": "1.0.0",
+  "description": "A kid-friendly chess game, built together with a 9-year-old.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "author": "mearkus",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "chess.js": "^1.4.0"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.2"
+  },
+  "private": true,
+  "type": "module"
+}

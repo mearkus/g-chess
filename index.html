@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#2b2d42" />
+    <title>G Chess</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top">
+        <h1>G Chess</h1>
+        <button class="icon-btn ui" id="settings-btn" aria-label="Settings">⚙︎</button>
+      </header>
+
+      <p class="status ui" id="status" role="status" aria-live="polite">Your turn!</p>
+
+      <div class="tray" id="tray-top" aria-label="Pieces captured"></div>
+      <div class="board-wrap">
+        <div class="board" id="board" role="grid" aria-label="Chess board"></div>
+      </div>
+      <div class="tray" id="tray-bottom" aria-label="Pieces captured"></div>
+
+      <nav class="controls">
+        <button class="btn ui" id="undo-btn">↶ Undo</button>
+        <button class="btn ui" id="hint-btn">💡 Hint</button>
+        <button class="btn ui primary" id="new-btn">New game</button>
+      </nav>
+    </main>
+
+    <dialog id="settings" class="sheet">
+      <form method="dialog">
+        <h2>New game</h2>
+        <fieldset>
+          <legend>Play against</legend>
+          <label><input type="radio" name="mode" value="computer" checked /> The computer</label>
+          <label><input type="radio" name="mode" value="friend" /> A friend</label>
+        </fieldset>
+        <fieldset id="level-set">
+          <legend>Computer level</legend>
+          <label><input type="radio" name="level" value="easy" checked /> Easy</label>
+          <label><input type="radio" name="level" value="medium" /> Medium</label>
+          <label><input type="radio" name="level" value="hard" /> Hard</label>
+        </fieldset>
+        <fieldset id="color-set">
+          <legend>I play</legend>
+          <label><input type="radio" name="color" value="w" checked /> White (go first)</label>
+          <label><input type="radio" name="color" value="b" /> Black</label>
+        </fieldset>
+        <fieldset>
+          <legend>Board</legend>
+          <label><input type="checkbox" name="labels" checked /> Show square names</label>
+        </fieldset>
+        <div class="sheet-actions">
+          <button class="btn ui" value="cancel">Cancel</button>
+          <button class="btn ui primary" value="start">Start</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="promotion" class="sheet">
+      <form method="dialog">
+        <h2>Your pawn made it! Pick a new piece:</h2>
+        <div class="promo-choices" id="promo-choices"></div>
+      </form>
+    </dialog>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
