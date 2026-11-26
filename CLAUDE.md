@@ -55,12 +55,19 @@ behavior changes, `npm test` passing before you call something done.
 - `src/leaderboard.js`: the leaderboard (wins, losses and ties for each player, wins against
   the computer by level, friend-vs-friend scores, and the ranking). No DOM, so it's unit tested.
   Players pick a fun character (🦊 Fox, 🐯 Tiger…) instead of typing a name.
+- `src/lessons.js`: Learn to play. The lessons (one per piece, then check, checkmate, castling,
+  promotion) and `LessonRun`, which checks each tap. No DOM, so it's unit tested. To add a
+  lesson, add an entry to `LESSONS`: a board position (FEN) and either squares to find or a goal
+  move to make.
+- `src/learn.js`: draws the Learn window (lesson list and lesson board) and handles its taps.
+- `src/pieces.js`: how a piece is drawn, shared by the game board and the lesson board.
 - `src/engine.js`: the computer opponent (small alpha-beta search). Levels easy/medium/hard
   set search depth and how often it plays a random move.
 - `src/style.css`: all the looks. Colors are CSS variables at the top of the file, an
   easy first place for him to make changes.
 - `test/`: Vitest tests. `ui.test.js` runs the page in jsdom and taps squares.
 - The game saves itself to `localStorage` (`g-chess:v1`), so a reload carries on.
-  The leaderboard lives in `localStorage` too (`g-chess:leaderboard:v1`), only on this device.
+  The leaderboard lives in `localStorage` too (`g-chess:leaderboard:v1`), only on this device,
+  and so do finished lessons (`g-chess:learn:v1`).
 - Starter-kit skills (from `mearkus/starter`) that fit this project: `add-game-audio`,
   `add-game-tutorial`, `mobile-polish`, `deploy-github-pages`.

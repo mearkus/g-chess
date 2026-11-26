@@ -1,12 +1,13 @@
 // Wires the game to the page: draws the board, handles taps, runs the computer.
 import { Game } from './game.js';
 import { PLAYERS, COMPUTER, isPlayer, otherPlayer, loadBoard, recordGame, rankings, headToHead } from './leaderboard.js';
+import { GLYPH, TEXT, glyph } from './pieces.js';
+import { setupLearn } from './learn.js';
 
-const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
-const TEXT = '︎'; // ask for the plain symbol, not an emoji
 const FILES = 'abcdefgh';
 const SAVE_KEY = 'g-chess:v1';
 const LEADERBOARD_KEY = 'g-chess:leaderboard:v1';
+const LEARN_KEY = 'g-chess:learn:v1';
 const COMPUTER_DELAY_MS = 550;
 
 const $ = (id) => document.getElementById(id);
@@ -31,10 +32,6 @@ let computerTimer = null;
 // It's a game, not a document: no long-press menus or stray text selection.
 for (const ev of ['contextmenu', 'selectstart']) {
   document.addEventListener(ev, (e) => { if (!e.target.closest('input, textarea')) e.preventDefault(); });
-}
-
-function glyph(piece) {
-  return `<span class="piece ${piece.color}">${GLYPH[piece.type]}${TEXT}</span>`;
 }
 
 /** The player's colour goes at the bottom. With a friend, White is at the bottom. */
@@ -285,6 +282,14 @@ function openLeaderboard() {
   $('leaderboard').showModal();
 }
 $('leaderboard-btn').addEventListener('click', openLeaderboard);
+
+// Learn to play: lessons in their own window, so the game underneath is left as it was.
+const openLearn = setupLearn({ store: makeStore(LEARN_KEY), askPromotion });
+$('learn-btn').addEventListener('click', openLearn);
+$('learn-from-settings').addEventListener('click', () => {
+  $('settings').close();
+  openLearn();
+});
 $('settings-btn').addEventListener('click', openSettings);
 
 render();
