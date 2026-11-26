@@ -12,6 +12,7 @@
       <header class="top">
         <h1>G Chess</h1>
         <div class="top-btns">
+          <button class="icon-btn ui" id="learn-btn" aria-label="Learn to play">🎓</button>
           <button class="icon-btn ui" id="leaderboard-btn" aria-label="Leaderboard">🏆</button>
           <button class="icon-btn ui" id="settings-btn" aria-label="Settings">⚙︎</button>
         </div>
@@ -35,6 +36,7 @@
     <dialog id="settings" class="sheet">
       <form method="dialog">
         <h2>New game</h2>
+        <button type="button" class="btn ui learn-link" id="learn-from-settings">🎓 New to chess? Learn to play</button>
         <fieldset>
           <legend>Play against</legend>
           <label><input type="radio" name="mode" value="computer" checked /> The computer</label>
@@ -82,6 +84,29 @@
           <button class="btn ui primary" value="close">Done</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog id="learn" class="sheet learn">
+      <div id="learn-menu">
+        <h2>🎓 Learn to play</h2>
+        <p class="learn-sub" id="learn-sub"></p>
+        <div class="lesson-list" id="lesson-list"></div>
+        <div class="sheet-actions one">
+          <button type="button" class="btn ui primary" id="learn-close">Done</button>
+        </div>
+      </div>
+      <div id="learn-lesson" hidden>
+        <h2 id="lesson-title"></h2>
+        <p class="lesson-step" id="lesson-step"></p>
+        <p class="lesson-text" id="lesson-text"></p>
+        <div class="board learn-board" id="learn-board" role="grid" aria-label="Lesson board"></div>
+        <p class="lesson-feedback" id="lesson-feedback" role="status" aria-live="polite"></p>
+        <div class="lesson-actions">
+          <button type="button" class="btn ui" id="lesson-back">◀ Lessons</button>
+          <button type="button" class="btn ui" id="lesson-retry">↺ Again</button>
+          <button type="button" class="btn ui primary" id="lesson-next" disabled>Next ▶</button>
+        </div>
+      </div>
     </dialog>
 
     <dialog id="promotion" class="sheet">

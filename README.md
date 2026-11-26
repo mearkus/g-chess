@@ -12,6 +12,11 @@ Tap 🏆 to see the leaderboard. Before a game, pick who's playing (🦊 Fox,
 on each level, and wins, losses and ties between friends. It's saved on this
 device only.
 
+New to chess? Tap 🎓 (or "Learn to play" in the New game window) for ten short
+lessons: how each piece moves, check, checkmate, castling and promotion. You
+tap the squares a piece can go to, or make the move the lesson asks for, and
+finished lessons get a ⭐.
+
 ## Getting started
 
 ```bash
@@ -36,4 +41,5 @@ Things to build next. Add your own!
 - A coach that explains moves while you play
 - Pick your own board colors
 - A funny celebration when you win
+- More lessons: en passant, stalemate, and little puzzles to practice
 - Leaderboard: type your own nickname (needs Dad's OK), and a button to start the leaderboard over
