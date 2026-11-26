@@ -89,14 +89,18 @@
     <dialog id="learn" class="sheet learn">
       <div id="learn-menu">
         <h2>🎓 Learn to play</h2>
-        <p class="learn-sub" id="learn-sub"></p>
-        <div class="lesson-list" id="lesson-list"></div>
+        <div class="learn-stats">
+          <span id="learn-streak"></span>
+          <span id="learn-stars"></span>
+        </div>
+        <div class="lesson-path" id="lesson-path"></div>
         <div class="sheet-actions one">
           <button type="button" class="btn ui primary" id="learn-close">Done</button>
         </div>
       </div>
       <div id="learn-lesson" hidden>
         <h2 id="lesson-title"></h2>
+        <div class="lesson-progress" aria-hidden="true"><span id="lesson-bar"></span></div>
         <p class="lesson-step" id="lesson-step"></p>
         <p class="lesson-text" id="lesson-text"></p>
         <div class="board learn-board" id="learn-board" role="grid" aria-label="Lesson board"></div>
@@ -105,6 +109,16 @@
           <button type="button" class="btn ui" id="lesson-back">◀ Lessons</button>
           <button type="button" class="btn ui" id="lesson-retry">↺ Again</button>
           <button type="button" class="btn ui primary" id="lesson-next" disabled>Next ▶</button>
+        </div>
+      </div>
+      <div id="learn-result" class="learn-result" hidden>
+        <h2 id="result-title"></h2>
+        <p class="result-stars" id="result-stars"></p>
+        <p class="result-text" id="result-text"></p>
+        <p class="result-streak" id="result-streak"></p>
+        <div class="sheet-actions">
+          <button type="button" class="btn ui" id="result-path">Path</button>
+          <button type="button" class="btn ui primary" id="result-next"></button>
         </div>
       </div>
     </dialog>

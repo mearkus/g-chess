@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { LESSONS, LessonRun, lessonById, loadProgress, markDone, nextLesson } from '../src/lessons.js';
+import {
+  UNITS, LESSONS, LessonRun, lessonById, loadProgress, finishLesson, nextLesson,
+  isUnlocked, currentStreak, playedToday, totalStars, starsFor, dayKey,
+} from '../src/lessons.js';
 
 /** Tap every square the piece can reach, in a 'squares' step. */
 function findAll(run) {
@@ -7,10 +10,15 @@ function findAll(run) {
 }
 
 describe('lessons', () => {
-  it('there is a lesson for every piece, then check, checkmate, castling and promotion', () => {
-    expect(LESSONS.map((l) => l.id)).toEqual([
-      'pawn', 'rook', 'bishop', 'queen', 'knight', 'king', 'check', 'checkmate', 'castling', 'promotion',
+  it('the path has four units: pieces, capturing, check and checkmate, special moves', () => {
+    expect(UNITS.map((u) => [u.id, u.lessons.map((l) => l.id)])).toEqual([
+      ['pieces', ['pawn', 'rook', 'bishop', 'queen', 'knight', 'king']],
+      ['capture', ['take-it', 'best-capture']],
+      ['mate', ['check', 'checkmate']],
+      ['special', ['castling', 'promotion']],
     ]);
+    expect(LESSONS).toHaveLength(12);
+    expect(lessonById('take-it').unit).toBe('capture');
   });
 
   it('every step can be finished, and every squares step asks for a number of squares that exists', () => {
@@ -94,7 +102,7 @@ describe('lessons', () => {
     expect(run.tap('a2').type).toBe('nope');
     run.tap('a1');
     expect(run.tap('a8').type).toBe('complete');
-    expect(run.finished).toBe(true);
+    expect(run.finished).toBe(false); // two more checkmates to go
   });
 
   it('castling: the king steps two squares and the rook jumps over', () => {
@@ -123,13 +131,111 @@ describe('lessons', () => {
     expect(run.done).toBe(false);
   });
 
-  it('progress remembers finished lessons and suggests the next one', () => {
+  it('capture: only a capture counts, and "take the big one" wants the right piece', () => {
+    const run = new LessonRun(lessonById('take-it'));
+    run.tap('a1');
+    expect(run.tap('a3').type).toBe('nope');
+    run.tap('a1');
+    expect(run.tap('a6').type).toBe('complete');
+
+    const big = new LessonRun(lessonById('best-capture'));
+    big.tap('d1');
+    expect(big.tap('d5').type).toBe('nope'); // only a pawn
+    big.tap('d1');
+    expect(big.tap('a1').type).toBe('complete'); // the queen
+    big.next();
+    big.tap('e4');
+    expect(big.tap('d6').type).toBe('nope'); // bishop, 3 points
+    big.tap('e4');
+    expect(big.tap('f6').type).toBe('complete'); // rook, 5 points
+  });
+
+  it('checkmate: three different checkmates to find', () => {
+    const run = new LessonRun(lessonById('checkmate'), 1);
+    run.tap('h1');
+    expect(run.tap('a1').type).toBe('nope'); // check, but the king slips out to b8
+    run.tap('h1');
+    expect(run.tap('h8').type).toBe('complete');
+    run.next();
+    run.tap('h7');
+    expect(run.tap('h8').type).toBe('nope'); // check, but now the second row is open
+    run.tap('g1');
+    expect(run.tap('a1').type).toBe('nope');
+    run.tap('g1');
+    expect(run.tap('g8').type).toBe('complete');
+  });
+
+  it('mistakes cost stars: none is 3, one or two is 2, more is 1', () => {
+    expect([0, 1, 2, 3, 9].map(starsFor)).toEqual([3, 2, 2, 1, 1]);
+    const run = new LessonRun(lessonById('pawn'));
+    run.tap('e2'); // tapping the pawn itself isn't a mistake
+    run.tap('e3');
+    run.tap('e3'); // nor is tapping a found square again
+    expect(run.mistakes).toBe(0);
+    run.tap('h8');
+    expect(run.mistakes).toBe(1);
+    expect(run.stars).toBe(2);
+    run.tap('e4');
+    expect(run.progress).toBe(0.5);
+    run.next();
+    expect(run.mistakes).toBe(1); // carries across the parts of a lesson
+  });
+
+  it('lessons unlock one at a time, in order', () => {
     let p = loadProgress(null);
+    expect(isUnlocked(p, 'pawn')).toBe(true);
+    expect(isUnlocked(p, 'rook')).toBe(false);
+    expect(isUnlocked(p, 'promotion')).toBe(false);
     expect(nextLesson(p).id).toBe('pawn');
-    p = markDone(markDone(p, 'pawn'), 'pawn');
-    expect(p.done).toEqual(['pawn']);
+    p = finishLesson(p, 'pawn', 2, '2026-11-26');
+    expect(isUnlocked(p, 'rook')).toBe(true);
+    expect(isUnlocked(p, 'bishop')).toBe(false);
     expect(nextLesson(p).id).toBe('rook');
-    expect(loadProgress({ done: ['pawn', 'made-up'] }).done).toEqual(['pawn']);
-    expect(loadProgress({ done: 'oops' }).done).toEqual([]);
+  });
+
+  it('keeps your best stars for a lesson', () => {
+    let p = finishLesson(loadProgress(null), 'pawn', 2, '2026-11-26');
+    p = finishLesson(p, 'pawn', 3, '2026-11-26');
+    p = finishLesson(p, 'pawn', 1, '2026-11-26');
+    expect(p.stars.pawn).toBe(3);
+    p = finishLesson(p, 'rook', 1, '2026-11-26');
+    expect(totalStars(p)).toBe(4);
+  });
+
+  it('the streak grows once a day and breaks after a missed day', () => {
+    let p = loadProgress(null);
+    expect(currentStreak(p, '2026-11-26')).toBe(0);
+    p = finishLesson(p, 'pawn', 3, '2026-11-26');
+    p = finishLesson(p, 'rook', 3, '2026-11-26'); // same day: still 1
+    expect(currentStreak(p, '2026-11-26')).toBe(1);
+    expect(playedToday(p, '2026-11-26')).toBe(true);
+    // Next day, before a lesson: the streak is still alive, but not done for today.
+    expect(currentStreak(p, '2026-11-27')).toBe(1);
+    expect(playedToday(p, '2026-11-27')).toBe(false);
+    p = finishLesson(p, 'bishop', 3, '2026-11-27');
+    expect(currentStreak(p, '2026-11-27')).toBe(2);
+    // Across the end of a month too.
+    p = finishLesson(p, 'queen', 3, '2026-11-28');
+    p = finishLesson(p, 'knight', 3, '2026-11-29');
+    p = finishLesson(p, 'king', 3, '2026-11-30');
+    p = finishLesson(p, 'take-it', 3, '2026-12-01');
+    expect(currentStreak(p, '2026-12-01')).toBe(6);
+    // Skip a day and it's gone; the next lesson starts it again at 1.
+    expect(currentStreak(p, '2026-12-03')).toBe(0);
+    p = finishLesson(p, 'best-capture', 3, '2026-12-03');
+    expect(currentStreak(p, '2026-12-03')).toBe(1);
+  });
+
+  it('dayKey uses the date on this device', () => {
+    expect(dayKey(new Date(2026, 0, 5, 23, 30))).toBe('2026-01-05');
+  });
+
+  it('loads saved progress safely, including progress saved before stars existed', () => {
+    expect(loadProgress({ done: ['pawn', 'made-up'] }).stars).toEqual({ pawn: 1 });
+    expect(loadProgress({ done: 'oops' }).stars).toEqual({});
+    const p = loadProgress({ stars: { pawn: 3, rook: 7, nope: 2 }, streak: { days: 4, last: '2026-11-25' } });
+    expect(p.stars).toEqual({ pawn: 3 });
+    expect(p.streak).toEqual({ days: 4, last: '2026-11-25' });
+    expect(loadProgress({ streak: { days: 'lots', last: 'today' } }).streak).toEqual({ days: 0, last: null });
   });
 });
