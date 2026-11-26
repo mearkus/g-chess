@@ -55,11 +55,13 @@ behavior changes, `npm test` passing before you call something done.
 - `src/leaderboard.js`: the leaderboard (wins, losses and ties for each player, wins against
   the computer by level, friend-vs-friend scores, and the ranking). No DOM, so it's unit tested.
   Players pick a fun character (🦊 Fox, 🐯 Tiger…) instead of typing a name.
-- `src/lessons.js`: Learn to play. The lessons (one per piece, then check, checkmate, castling,
-  promotion) and `LessonRun`, which checks each tap. No DOM, so it's unit tested. To add a
-  lesson, add an entry to `LESSONS`: a board position (FEN) and either squares to find or a goal
-  move to make.
-- `src/learn.js`: draws the Learn window (lesson list and lesson board) and handles its taps.
+- `src/lessons.js`: Learn to play. `UNITS` is the lesson path (units of lessons, each lesson a
+  few steps), plus `LessonRun`, which checks each tap and counts mistakes, and the progress
+  helpers: stars (3 for no mistakes), lessons unlocking in order, and the daily streak. No DOM,
+  so it's unit tested. To add a lesson, add an entry to a unit: a board position (FEN) and either
+  squares to find or a goal move to make (check, checkmate, castle, promote, capture).
+- `src/learn.js`: draws the Learn window (the path, the lesson board and the "lesson done"
+  screen) and handles its taps.
 - `src/pieces.js`: how a piece is drawn, shared by the game board and the lesson board.
 - `src/engine.js`: the computer opponent (small alpha-beta search). Levels easy/medium/hard
   set search depth and how often it plays a random move.
@@ -68,6 +70,6 @@ behavior changes, `npm test` passing before you call something done.
 - `test/`: Vitest tests. `ui.test.js` runs the page in jsdom and taps squares.
 - The game saves itself to `localStorage` (`g-chess:v1`), so a reload carries on.
   The leaderboard lives in `localStorage` too (`g-chess:leaderboard:v1`), only on this device,
-  and so do finished lessons (`g-chess:learn:v1`).
+  and so do lesson stars and the streak (`g-chess:learn:v1`).
 - Starter-kit skills (from `mearkus/starter`) that fit this project: `add-game-audio`,
   `add-game-tutorial`, `mobile-polish`, `deploy-github-pages`.

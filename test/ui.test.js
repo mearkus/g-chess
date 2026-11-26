@@ -69,40 +69,58 @@ describe('page', () => {
     expect(document.getElementById('lb-pairs').textContent).toMatch(/Dragon 0 – 1 Shark|Shark 1 – 0 Dragon/);
     expect(document.getElementById('lb-empty').hidden).toBe(true);
   });
-  it('learn mode: open a lesson, find the squares, and get a star', () => {
+  it('learn mode: the path, a lesson, the result and a star', () => {
     const learn = document.getElementById('learn');
     const lessonTap = (sq) => learn.querySelector(`[data-square="${sq}"]`).click();
     document.getElementById('learn-btn').click();
     expect(learn.open).toBe(true);
-    const picks = learn.querySelectorAll('.lesson-pick');
-    expect(picks.length).toBe(10);
-    expect(picks[0].classList.contains('suggested')).toBe(true);
+    const steps = learn.querySelectorAll('.path-step');
+    expect(steps.length).toBe(12);
+    expect(learn.querySelectorAll('.unit-title').length).toBe(4);
+    expect(steps[0].classList.contains('suggested')).toBe(true);
+    expect(steps[1].disabled).toBe(true); // rook is locked until the pawn is done
+    expect(document.getElementById('learn-streak').textContent).toMatch(/streak/);
 
-    picks[0].click(); // The pawn
+    steps[0].click(); // The pawn
     expect(document.getElementById('learn-lesson').hidden).toBe(false);
     expect(document.getElementById('lesson-text').textContent).toMatch(/Pawns walk straight forward/);
     expect(document.getElementById('lesson-next').disabled).toBe(true);
+    expect(document.getElementById('lesson-bar').style.width).toBe('0%');
 
-    lessonTap('h8');
+    lessonTap('h8'); // a mistake
     expect(document.getElementById('lesson-feedback').dataset.tone).toBe('bad');
     lessonTap('e3');
     expect(learn.querySelector('[data-square="e3"]').classList.contains('found')).toBe(true);
     lessonTap('e4');
     expect(document.getElementById('lesson-feedback').dataset.tone).toBe('win');
+    expect(document.getElementById('lesson-bar').style.width).toBe('50%');
     document.getElementById('lesson-next').click();
 
     // Part 2: capture on a slant.
     expect(document.getElementById('lesson-step').textContent).toBe('Part 2 of 2');
     lessonTap('c5');
     lessonTap('e5');
-    expect(document.getElementById('lesson-next').textContent).toMatch(/Next lesson/);
-    expect(JSON.parse(localStorage.getItem('g-chess:learn:v1')).done).toEqual(['pawn']);
+    expect(document.getElementById('lesson-next').textContent).toMatch(/Finish/);
+    document.getElementById('lesson-next').click();
 
-    document.getElementById('lesson-back').click();
+    // The "lesson done" screen: one mistake is 2 stars, and the streak starts.
+    expect(document.getElementById('learn-result').hidden).toBe(false);
+    expect(document.getElementById('result-stars').textContent).toBe('⭐⭐☆');
+    expect(document.getElementById('result-text').textContent).toMatch(/1 mistake/);
+    expect(document.getElementById('result-streak').textContent).toBe('🔥 1 day in a row!');
+    expect(document.getElementById('result-next').textContent).toMatch(/Next: The rook/);
+    const saved = JSON.parse(localStorage.getItem('g-chess:learn:v1'));
+    expect(saved.stars).toEqual({ pawn: 2 });
+    expect(saved.streak.days).toBe(1);
+
+    document.getElementById('result-path').click();
     const pawn = learn.querySelector('[data-lesson="pawn"]');
     expect(pawn.classList.contains('done')).toBe(true);
-    expect(pawn.textContent).toMatch(/⭐/);
-    expect(learn.querySelector('[data-lesson="rook"]').classList.contains('suggested')).toBe(true);
+    expect(pawn.textContent).toMatch(/⭐⭐☆/);
+    const rook = learn.querySelector('[data-lesson="rook"]');
+    expect(rook.disabled).toBe(false);
+    expect(rook.classList.contains('suggested')).toBe(true);
+    expect(document.getElementById('learn-streak').textContent).toBe('🔥 1 day in a row');
 
     // The game underneath is left alone.
     expect(document.querySelectorAll('#board .sq')).toHaveLength(64);
@@ -111,7 +129,13 @@ describe('page', () => {
   it('learn mode: a move lesson moves pieces and goes back on a wrong try', () => {
     const learn = document.getElementById('learn');
     const lessonTap = (sq) => learn.querySelector(`[data-square="${sq}"]`).click();
+    // Pretend the lessons before checkmate are done, then open Learn again.
+    const stars = {};
+    for (const id of ['pawn', 'rook', 'bishop', 'queen', 'knight', 'king', 'take-it', 'best-capture', 'check']) stars[id] = 3;
+    localStorage.setItem('g-chess:learn:v1', JSON.stringify({ stars }));
+    document.getElementById('learn-btn').click();
     learn.querySelector('[data-lesson="checkmate"]').click();
+    expect(document.getElementById('learn-lesson').hidden).toBe(false);
     lessonTap('a1');
     expect(learn.querySelectorAll('.dot').length).toBeGreaterThan(0);
     lessonTap('a2');
@@ -121,6 +145,7 @@ describe('page', () => {
     lessonTap('a8');
     expect(document.getElementById('lesson-feedback').textContent).toMatch(/Checkmate! You win/);
     expect(learn.querySelector('[data-square="a8"] .piece')).not.toBeNull();
+    expect(document.getElementById('lesson-step').textContent).toBe('Part 1 of 3');
   });
 
   it('the New game window has a way into learn mode', () => {
